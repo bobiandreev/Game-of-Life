@@ -30,7 +30,7 @@
  *
  */
 
-Grid::Grid() : gridWidth(0), gridHeight(0) {
+Grid::Grid() : grid_width(0), grid_height(0) {
     std::cout << "Grid with size 0 initalized" << std::endl;
 }
 
@@ -58,7 +58,7 @@ Grid::Grid() : gridWidth(0), gridHeight(0) {
  *      The edge size to use for the width and height of the grid.
  */
 
-Grid::Grid(int square_grid_size) : gridWidth(square_grid_size), gridHeight(square_grid_size) {
+Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size) {
     std::cout << "Square grid with sie of " << square_grid_size << "initalized" << std::endl;
 }
 
@@ -80,7 +80,7 @@ Grid::Grid(int square_grid_size) : gridWidth(square_grid_size), gridHeight(squar
  *      The height of the grid.
  */
 
-Grid::Grid(int width, int height) : gridWidth(width), gridHeight(height) {
+Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
     std::cout << "Grid with width " << width << "and height " << height << "initalized" << std::endl;
 }
 
@@ -108,8 +108,8 @@ Grid::Grid(int width, int height) : gridWidth(width), gridHeight(height) {
  *      The width of the grid.
  */
 
-const int & Grid::getWidth() const {
-    return gridWidth;
+const int & Grid::get_width() const {
+    return grid_width;
 }
 
 /**
@@ -136,8 +136,8 @@ const int & Grid::getWidth() const {
  *      The height of the grid.
  */
 
-const int & Grid::getHeight() const { {
-    return gridHeight;
+const int & Grid::get_height()  const {
+    return grid_height;
 }
 
 /**
@@ -164,6 +164,9 @@ const int & Grid::getHeight() const { {
  *      The number of total cells.
  */
 
+const int & Grid::get_total_cells() const {
+    return this->grid_height * this->grid_width;
+}
 
 /**
  * Grid::get_alive_cells()

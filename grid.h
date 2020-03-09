@@ -30,8 +30,8 @@ class Grid {
     //      Step 2. Draw the rest of the owl.
 private:
 
-    int gridHeight;
-    int gridWidth;
+    int grid_height;
+    int grid_width;
 
 public:
 
@@ -39,7 +39,9 @@ public:
     Grid(int square_grid_size);
     Grid(int width, int height);
 
-    const int & getWidth() const;
-    const int & getHeight() const;
+    const int & get_width() const;
+    const int & get_height() const;
+
+    const int & get_total_cells() const;
 
 };
