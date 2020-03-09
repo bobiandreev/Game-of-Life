@@ -8,9 +8,10 @@
  *
  * You are encouraged to use STL container types as an underlying storage mechanism for the grid cells.
  *
- * @author YOUR_STUDENT_NUMBER
+ * @author 958753
  * @date March, 2020
  */
+#include <iostream>
 #include "grid.h"
 
 // Include the minimal number of headers needed to support your implementation.
@@ -29,6 +30,9 @@
  *
  */
 
+Grid::Grid() : gridWidth(0), gridHeight(0) {
+    std::cout << "Grid with size 0 initalized" << std::endl;
+}
 
 /**
  * Grid::Grid(square_size)
@@ -54,6 +58,10 @@
  *      The edge size to use for the width and height of the grid.
  */
 
+Grid::Grid(int square_grid_size) : gridWidth(square_grid_size), gridHeight(square_grid_size) {
+    std::cout << "Square grid with sie of " << square_grid_size << "initalized" << std::endl;
+}
+
 
 /**
  * Grid::Grid(width, height)
@@ -72,6 +80,9 @@
  *      The height of the grid.
  */
 
+Grid::Grid(int width, int height) : gridWidth(width), gridHeight(height) {
+    std::cout << "Grid with width " << width << "and height " << height << "initalized" << std::endl;
+}
 
 /**
  * Grid::get_width()
@@ -97,6 +108,9 @@
  *      The width of the grid.
  */
 
+const int & Grid::getWidth() const {
+    return gridWidth;
+}
 
 /**
  * Grid::get_height()
@@ -122,6 +136,9 @@
  *      The height of the grid.
  */
 
+const int & Grid::getHeight() const { {
+    return gridHeight;
+}
 
 /**
  * Grid::get_total_cells()
