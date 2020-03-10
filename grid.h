@@ -13,7 +13,6 @@
 // Add the minimal number of includes you need in order to declare the class.
 // #include ...
 
-#include <vector>
 
 /**
  * A Cell is a char limited to two named values for Cell::DEAD and Cell::ALIVE.
@@ -47,7 +46,7 @@ public:
 
     explicit Grid(int width, int height);
 
-    const int get_width() const;
+    const int &get_width() const;
 
     const int &get_height() const;
 
@@ -57,10 +56,16 @@ public:
 
     int get_dead_cells() const;
 
+    void resize(int square_size);
+
+    void resize(int width, int height);
+
     char get(int x, int y) const;
 
     Cell & operator()(int x, int y) const;
 
     void set(int X, int Y, int value) const;
+
+    
 
 };

@@ -31,8 +31,8 @@
  */
 
 Grid::Grid() : grid_width(0), grid_height(0) {
-    cells_arr = new Cell[grid_height*grid_width];
-    std::cout << "Grid with size 0 initalized" << std::endl;
+    //   cells_arr = new Cell[grid_height * grid_width];
+    std::cout << "Grid with size " << grid_height * grid_width << " initalized" << std::endl;
 }
 
 /**
@@ -60,8 +60,10 @@ Grid::Grid() : grid_width(0), grid_height(0) {
  */
 
 Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size) {
-    cells_arr = new Cell[square_grid_size*square_grid_size];
-    for (int i = 0; i < sizeof(cells_arr); ++i) {
+    cells_arr = new Cell[grid_height * grid_width];
+    std::cout << grid_height * grid_width << std::endl;
+    int cells_num = grid_height * grid_width;
+    for (int i = 0; i < cells_num; ++i) {
         cells_arr[i] = Cell::DEAD;
     }
     std::cout << "Square grid with size of " << square_grid_size << " initalized" << std::endl;
@@ -86,8 +88,9 @@ Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(squ
  */
 
 Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
-    cells_arr = new Cell[grid_width*grid_height];
-    for (int i = 0; i < sizeof(cells_arr); ++i) {
+    int num_cells = grid_height * grid_width;
+    cells_arr = new Cell[num_cells];
+    for (int i = 0; i < num_cells; ++i) {
         cells_arr[i] = Cell::DEAD;
     }
     std::cout << "Grid with width " << grid_width << " and height " << grid_height << " initalized" << std::endl;
@@ -117,9 +120,9 @@ Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
  *      The width of the grid.
  */
 
-const int Grid::get_width() const {
+const int &Grid::get_width() const {
     return grid_width;
- }
+}
 
 /**
  * Grid::get_height()
@@ -174,7 +177,7 @@ const int &Grid::get_height() const {
  */
 
 int Grid::get_total_cells() const {
-    return grid_width*grid_height;
+    return grid_width * grid_height;
 }
 
 /**
@@ -203,11 +206,12 @@ int Grid::get_total_cells() const {
 
 int Grid::get_alive_cells() const {
     int count = 0;
-    for (int i = 0; i < sizeof(cells_arr); i++){
-            if (char(cells_arr[i]) == '#'){
-                count++;
-            }
+    int num_cells = grid_width * grid_height;
+    for (int i = 0; i < num_cells; i++) {
+        if (char(cells_arr[i]) == '#') {
+            count++;
         }
+    }
     return count;
 }
 
@@ -238,11 +242,12 @@ int Grid::get_alive_cells() const {
 
 int Grid::get_dead_cells() const {
     int count = 0;
-    for (int i = 0; i < sizeof(cells_arr); ++i) {
-            if (char(cells_arr[i])== ' '){
-                count++;
-            }
+    int num_cells = grid_width * grid_height;
+    for (int i = 0; i < num_cells; ++i) {
+        if (cells_arr[i] == Cell::DEAD) {
+            count++;
         }
+    }
     return count;
 }
 
@@ -263,6 +268,22 @@ int Grid::get_dead_cells() const {
  * @param square_size
  *      The new edge size for both the width and height of the grid.
  */
+
+void Grid::resize(int square_size) {
+//    grid_height = square_size;
+//    grid_width = square_size;
+//    int num_cells = grid_width * grid_height;
+//    Cell *new_grid = new Cell[num_cells];
+//    for (int i = 0; i < num_cells; ++i) {
+//        if (char(cells_arr[i]) == '#') {
+//            new_grid[i] = Cell::ALIVE;
+//        } else {
+//            new_grid[i] = Cell::DEAD;
+//        }
+//    }
+//    cells_arr = new_grid;
+    resize(square_size, square_size);
+}
 
 
 /**
@@ -286,6 +307,37 @@ int Grid::get_dead_cells() const {
  *      The new height for the grid.
  */
 
+void Grid::resize(int width, int height) {
+    int old_height = grid_height;
+    int old_width = grid_width;
+    int num_cells_new;
+    if (grid_width == 0 || grid_height == 0) {
+        num_cells_new = grid_width + grid_height;
+    } else {
+        num_cells_new = width * height;
+    }
+    Cell *new_grid = new Cell[num_cells_new];
+    for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, y++) {
+        if (y >= width) {
+            y = 0;
+            x++;
+        }
+        if (y < old_width && x < old_height) {
+            if (char(cells_arr[get_index(x,y)]) == '#') {
+                new_grid[i] = Cell::ALIVE;
+            } else {
+                new_grid[i] = Cell::DEAD;
+            }
+
+        } else {
+            new_grid[i] = Cell::DEAD;
+        }
+    }
+    grid_height = height;
+    grid_width = width;
+    cells_arr = new_grid;
+}
+
 
 /**
  * Grid::get_index(x, y)
@@ -305,7 +357,7 @@ int Grid::get_dead_cells() const {
  */
 
 int Grid::get_index(int x, int y) const {
-    int one_d_index = x * grid_height + y;
+    int one_d_index = x * grid_width + y;
     return one_d_index;
 }
 
@@ -338,7 +390,7 @@ int Grid::get_index(int x, int y) const {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 char Grid::get(int x, int y) const {
-    return char(operator()(x,y));
+    return char(operator()(x, y));
 }
 
 /**
@@ -370,7 +422,11 @@ char Grid::get(int x, int y) const {
  */
 
 void Grid::set(int x, int y, int value) const {
-    operator()(x,y) = static_cast<Cell>(value);
+    if (x <= grid_width && y <= grid_height) {
+        operator()(x, y) = static_cast<Cell>(value);
+    } else {
+        throw std::runtime_error("Coordinates not valid");
+    }
 }
 
 /**
@@ -409,9 +465,13 @@ void Grid::set(int x, int y, int value) const {
  *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
  */
 
-Cell & Grid::operator()(int x, int y) const {
-    int index = get_index(x, y);
-    return cells_arr[index];;
+Cell &Grid::operator()(int x, int y) const {
+    if (x <= grid_width && y <= grid_height) {
+        int index = get_index(y, x);
+        return cells_arr[index];
+    } else {
+        throw std::runtime_error("Coordinates not valid");
+    }
 }
 
 /**
@@ -572,6 +632,7 @@ Cell & Grid::operator()(int x, int y) const {
  *      +---+
  *
  * @param os
+ *
  *      An ascii mode output stream such as std::cout.
  *
  * @param grid
