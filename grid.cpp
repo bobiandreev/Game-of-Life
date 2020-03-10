@@ -31,6 +31,7 @@
  */
 
 Grid::Grid() : grid_width(0), grid_height(0) {
+    cells_arr = new Cell[grid_height*grid_width];
     std::cout << "Grid with size 0 initalized" << std::endl;
 }
 
@@ -59,7 +60,11 @@ Grid::Grid() : grid_width(0), grid_height(0) {
  */
 
 Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size) {
-    std::cout << "Square grid with sie of " << square_grid_size << "initalized" << std::endl;
+    cells_arr = new Cell[square_grid_size*square_grid_size];
+    for (int i = 0; i < sizeof(cells_arr); ++i) {
+        cells_arr[i] = Cell::DEAD;
+    }
+    std::cout << "Square grid with size of " << square_grid_size << " initalized" << std::endl;
 }
 
 
@@ -81,7 +86,11 @@ Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(squ
  */
 
 Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
-    std::cout << "Grid with width " << width << "and height " << height << "initalized" << std::endl;
+    cells_arr = new Cell[grid_width*grid_height];
+    for (int i = 0; i < sizeof(cells_arr); ++i) {
+        cells_arr[i] = Cell::DEAD;
+    }
+    std::cout << "Grid with width " << grid_width << " and height " << grid_height << " initalized" << std::endl;
 }
 
 /**
@@ -108,9 +117,9 @@ Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
  *      The width of the grid.
  */
 
-const int & Grid::get_width() const {
+const int Grid::get_width() const {
     return grid_width;
-}
+ }
 
 /**
  * Grid::get_height()
@@ -136,7 +145,7 @@ const int & Grid::get_width() const {
  *      The height of the grid.
  */
 
-const int & Grid::get_height()  const {
+const int &Grid::get_height() const {
     return grid_height;
 }
 
@@ -164,8 +173,8 @@ const int & Grid::get_height()  const {
  *      The number of total cells.
  */
 
-const int & Grid::get_total_cells() const {
-    return this->grid_height * this->grid_width;
+int Grid::get_total_cells() const {
+    return grid_width*grid_height;
 }
 
 /**
@@ -192,6 +201,16 @@ const int & Grid::get_total_cells() const {
  *      The number of alive cells.
  */
 
+int Grid::get_alive_cells() const {
+    int count = 0;
+    for (int i = 0; i < sizeof(cells_arr); i++){
+            if (char(cells_arr[i]) == '#'){
+                count++;
+            }
+        }
+    return count;
+}
+
 
 /**
  * Grid::get_dead_cells()
@@ -217,6 +236,15 @@ const int & Grid::get_total_cells() const {
  *      The number of dead cells.
  */
 
+int Grid::get_dead_cells() const {
+    int count = 0;
+    for (int i = 0; i < sizeof(cells_arr); ++i) {
+            if (char(cells_arr[i])== ' '){
+                count++;
+            }
+        }
+    return count;
+}
 
 /**
  * Grid::resize(square_size)
@@ -276,6 +304,10 @@ const int & Grid::get_total_cells() const {
  *      The 1d offset from the start of the data array where the desired cell is located.
  */
 
+int Grid::get_index(int x, int y) const {
+    int one_d_index = x * grid_height + y;
+    return one_d_index;
+}
 
 /**
  * Grid::get(x, y)
@@ -305,7 +337,9 @@ const int & Grid::get_total_cells() const {
  * @throws
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
-
+char Grid::get(int x, int y) const {
+    return char(operator()(x,y));
+}
 
 /**
  * Grid::set(x, y, value)
@@ -335,6 +369,9 @@ const int & Grid::get_total_cells() const {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 
+void Grid::set(int x, int y, int value) const {
+    operator()(x,y) = static_cast<Cell>(value);
+}
 
 /**
  * Grid::operator()(x, y)
@@ -372,6 +409,10 @@ const int & Grid::get_total_cells() const {
  *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
  */
 
+Cell & Grid::operator()(int x, int y) const {
+    int index = get_index(x, y);
+    return cells_arr[index];;
+}
 
 /**
  * Grid::operator()(x, y)

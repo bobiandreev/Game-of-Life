@@ -13,11 +13,13 @@
 // Add the minimal number of includes you need in order to declare the class.
 // #include ...
 
+#include <vector>
+
 /**
  * A Cell is a char limited to two named values for Cell::DEAD and Cell::ALIVE.
  */
 enum Cell : char {
-    DEAD  = ' ',
+    DEAD = ' ',
     ALIVE = '#'
 };
 
@@ -33,15 +35,32 @@ private:
     int grid_height;
     int grid_width;
 
+    Cell *cells_arr;
+
+    int get_index(int x, int y) const;
+
 public:
 
     Grid();
-    Grid(int square_grid_size);
-    Grid(int width, int height);
 
-    const int & get_width() const;
-    const int & get_height() const;
+    explicit Grid(int square_grid_size);
 
-    const int & get_total_cells() const;
+    explicit Grid(int width, int height);
+
+    const int get_width() const;
+
+    const int &get_height() const;
+
+    int get_total_cells() const;
+
+    int get_alive_cells() const;
+
+    int get_dead_cells() const;
+
+    char get(int x, int y) const;
+
+    Cell & operator()(int x, int y) const;
+
+    void set(int X, int Y, int value) const;
 
 };
