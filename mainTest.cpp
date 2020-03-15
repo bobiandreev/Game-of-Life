@@ -19,29 +19,12 @@ int main(int argc, char *argv[]){
     //std::cout << grid.get(1,1) << std::endl;
     //grid.set(1,1,Cell::DEAD);
     //std::cout << grid.get(1,1) << std::endl;
+    //grid.rotate(1);
 
-    std::cout << '+';
-    for (int i = 0; i < grid.get_width(); ++i) {
-        std::cout << '-';
-    }
-    std::cout << '+' << std::endl;
-    for (int y = 0; y < grid.get_height(); ++y) {
-        std::cout << '|';
-        for (int x = 0; x < grid.get_width(); ++x) {
-            //int one_d_index = x * grid_height + y;
-            if(grid.get(x,y)=='#'){
-                std::cout << '#';
-            } else {
-                std::cout << ' ';
-            }
-        }
-        std::cout << '|' << std::endl;
-    }
-    std::cout << '+';
-    for (int i = 0; i < grid.get_width(); ++i) {
-        std::cout << '-';
-    }
-    std::cout << '+' << std::endl;
+    Grid h = grid.rotate(1);
+
+    h.print(h);
+
     std::cout << grid.get_total_cells() << std::endl;
     std::cout << grid.get_dead_cells() << std::endl;
     std::cout << grid.get_height() << std::endl;

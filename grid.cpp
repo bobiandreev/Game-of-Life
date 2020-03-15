@@ -31,7 +31,6 @@
  */
 
 Grid::Grid() : grid_width(0), grid_height(0) {
-    //   cells_arr = new Cell[grid_height * grid_width];
     std::cout << "Grid with size " << grid_height * grid_width << " initalized" << std::endl;
 }
 
@@ -270,18 +269,6 @@ int Grid::get_dead_cells() const {
  */
 
 void Grid::resize(int square_size) {
-//    grid_height = square_size;
-//    grid_width = square_size;
-//    int num_cells = grid_width * grid_height;
-//    Cell *new_grid = new Cell[num_cells];
-//    for (int i = 0; i < num_cells; ++i) {
-//        if (char(cells_arr[i]) == '#') {
-//            new_grid[i] = Cell::ALIVE;
-//        } else {
-//            new_grid[i] = Cell::DEAD;
-//        }
-//    }
-//    cells_arr = new_grid;
     resize(square_size, square_size);
 }
 
@@ -323,7 +310,7 @@ void Grid::resize(int width, int height) {
             x++;
         }
         if (y < old_width && x < old_height) {
-            if (char(cells_arr[get_index(x,y)]) == '#') {
+            if (char(cells_arr[get_index(x, y)]) == '#') {
                 new_grid[i] = Cell::ALIVE;
             } else {
                 new_grid[i] = Cell::DEAD;
@@ -422,6 +409,8 @@ char Grid::get(int x, int y) const {
  */
 
 void Grid::set(int x, int y, int value) const {
+//    std::cout << "x2 " << x << " y2 " << y << std::endl;
+//    std::cout << "w " << grid_width << " h " << grid_height << std::endl;
     if (x <= grid_width && y <= grid_height) {
         operator()(x, y) = static_cast<Cell>(value);
     } else {
@@ -604,6 +593,71 @@ Cell &Grid::operator()(int x, int y) const {
  *      Returns a copy of the grid that has been rotated.
  */
 
+Grid Grid::rotate(int rotation) {
+
+    Grid grid_h;
+
+    for (int j = 0; j < get_total_cells(); ++j) {
+        //     std::cout << "char at index " << j << " is " << char(cells_arr[j]) << std::endl;
+    }
+
+    if (rotation == 0) {
+        grid_h.resize(get_width(), get_height());
+        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++y) {
+            if (y >= grid_width) {
+                y = 0;
+                x++;
+            }
+            if (char(cells_arr[get_index(x, y)] == '#')) {
+                grid_h(y, x) = Cell::ALIVE;
+            }
+        }
+    }
+
+
+    if (rotation != 0) {
+        //Cell *new_grid = new Cell[get_total_cells()];
+        int new_width = get_height();
+        int new_height = get_width();
+        grid_h.resize(new_width, new_height);
+        // std::cout << "Grid height " << grid_height << std::endl;
+        //std::cout << "Grid width " << grid_width << std::endl;
+
+        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++y) {
+            grid_width = new_height;
+            grid_height = new_width;
+
+            if (y >= grid_width) {
+                y = 0;
+                x++;
+            }
+            //  std::cout << "Grid height " << grid_height << std::endl;
+            // std::cout << "Grid width " << grid_width << std::endl;
+            // std::cout << "Return from getIndex " << get_index(x, y) << std::endl;
+            // std::cout << "Char at index " << char(cells_arr[get_index(x, y)]) << std::endl;
+            if (char(cells_arr[get_index(x, y)]) == '#') {
+                grid_width = new_width;
+                grid_height = new_height;
+                //   std::cout << "Grid height2 " << grid_height << std::endl;
+                //  std::cout << "Grid width2 " << grid_width << std::endl;
+                //std::cout << "New " << get_index(y, grid_width - x -1) << std::endl;
+                //std::cout << "x1 " << x << " y2 " << y << std::endl;
+                //std::cout << "x1 " << y << " y2 " << grid_width - x -1 << std::endl;
+                grid_h(grid_width - x - 1, y) = Cell::ALIVE;
+            } else {
+                grid_width = new_width;
+                grid_height = new_height;
+                //std::cout << "Grid height2 " << grid_height << std::endl;
+                //std::cout << "Grid width2 " << grid_width << std::endl;
+                //std::cout << "New " << get_index(y, grid_width - x -1) << std::endl;
+                //std::cout << "x1 " << x << " y1 " << y << std::endl;
+                //std::cout << "x2 " << y << " y2 " << grid_width - x -1 << std::endl;
+                grid_h(grid_width - x - 1, y) = Cell::DEAD;
+            }
+        }
+    }
+    return grid_h;
+}
 
 /**
  * operator<<(output_stream, grid)
@@ -642,3 +696,27 @@ Cell &Grid::operator()(int x, int y) const {
  *      Returns a reference to the output stream to enable operator chaining.
  */
 
+void Grid::print(Grid grid) {
+    std::cout << '+';
+    for (int i = 0; i < grid.get_width(); ++i) {
+        std::cout << '-';
+    }
+    std::cout << '+' << std::endl;
+    for (int y = 0; y < grid.get_height(); ++y) {
+        std::cout << '|';
+        for (int x = 0; x < grid.get_width(); ++x) {
+            if (grid.get(x, y) == '#') {
+                std::cout << '#';
+            } else {
+                std::cout << '.';
+            }
+        }
+        std::cout << '|' << std::endl;
+    }
+    std::cout << '+';
+    for (int i = 0; i < grid.get_width(); ++i) {
+        std::cout << '-';
+    }
+    std::cout << '+' << std::endl;
+
+}

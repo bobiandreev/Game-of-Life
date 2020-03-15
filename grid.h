@@ -66,6 +66,9 @@ public:
 
     void set(int X, int Y, int value) const;
 
+    Grid rotate(int rotation);
+
+    void print(Grid grid);
     
 
 };
