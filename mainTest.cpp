@@ -11,6 +11,7 @@ int main(int argc, char *argv[]){
             grid.set(x, y, Cell::ALIVE);
         }
     }
+    grid.print(grid);
     grid.resize(8,2);
     //std::cout << grid.get_dead_cells() << std::endl;
     //std::cout << grid.get(1,1) << std::endl;
@@ -21,13 +22,15 @@ int main(int argc, char *argv[]){
     //std::cout << grid.get(1,1) << std::endl;
     //grid.rotate(1);
 
+    grid.print(grid);
+
     Grid h = grid.rotate(1);
 
     h.print(h);
 
-    std::cout << grid.get_total_cells() << std::endl;
-    std::cout << grid.get_dead_cells() << std::endl;
-    std::cout << grid.get_height() << std::endl;
+  //  std::cout << grid.get_total_cells() << std::endl;
+  //  std::cout << grid.get_dead_cells() << std::endl;
+  //  std::cout << grid.get_height() << std::endl;
 
 }
 

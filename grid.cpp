@@ -344,7 +344,7 @@ void Grid::resize(int width, int height) {
  */
 
 int Grid::get_index(int x, int y) const {
-    int one_d_index = x * grid_width + y;
+    int one_d_index = y * grid_width + x;
     return one_d_index;
 }
 
@@ -456,7 +456,7 @@ void Grid::set(int x, int y, int value) const {
 
 Cell &Grid::operator()(int x, int y) const {
     if (x <= grid_width && y <= grid_height) {
-        int index = get_index(y, x);
+        int index = get_index(x, y);
         return cells_arr[index];
     } else {
         throw std::runtime_error("Coordinates not valid");
@@ -594,26 +594,20 @@ Cell &Grid::operator()(int x, int y) const {
  */
 
 Grid Grid::rotate(int rotation) {
-
     Grid grid_h;
-
-    for (int j = 0; j < get_total_cells(); ++j) {
-        //     std::cout << "char at index " << j << " is " << char(cells_arr[j]) << std::endl;
-    }
 
     if (rotation == 0) {
         grid_h.resize(get_width(), get_height());
-        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++y) {
-            if (y >= grid_width) {
-                y = 0;
-                x++;
+        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
+            if (x >= grid_width) {
+                x = 0;
+                y++;
             }
             if (char(cells_arr[get_index(x, y)] == '#')) {
-                grid_h(y, x) = Cell::ALIVE;
+                grid_h(x, y) = Cell::ALIVE;
             }
         }
     }
-
 
     if (rotation != 0) {
         //Cell *new_grid = new Cell[get_total_cells()];
@@ -623,27 +617,27 @@ Grid Grid::rotate(int rotation) {
         // std::cout << "Grid height " << grid_height << std::endl;
         //std::cout << "Grid width " << grid_width << std::endl;
 
-        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++y) {
+        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
             grid_width = new_height;
             grid_height = new_width;
 
-            if (y >= grid_width) {
-                y = 0;
-                x++;
+            if (x >= grid_width) {
+                x = 0;
+                y++;
             }
-            //  std::cout << "Grid height " << grid_height << std::endl;
+            // std::cout << "Grid height " << grid_height << std::endl;
             // std::cout << "Grid width " << grid_width << std::endl;
             // std::cout << "Return from getIndex " << get_index(x, y) << std::endl;
             // std::cout << "Char at index " << char(cells_arr[get_index(x, y)]) << std::endl;
             if (char(cells_arr[get_index(x, y)]) == '#') {
                 grid_width = new_width;
                 grid_height = new_height;
-                //   std::cout << "Grid height2 " << grid_height << std::endl;
-                //  std::cout << "Grid width2 " << grid_width << std::endl;
-                //std::cout << "New " << get_index(y, grid_width - x -1) << std::endl;
-                //std::cout << "x1 " << x << " y2 " << y << std::endl;
-                //std::cout << "x1 " << y << " y2 " << grid_width - x -1 << std::endl;
-                grid_h(grid_width - x - 1, y) = Cell::ALIVE;
+                // std::cout << "Grid height2 " << grid_height << std::endl;
+                // std::cout << "Grid width2 " << grid_width << std::endl;
+                // std::cout << "New " << get_index(grid_width - y -1, x ) << std::endl;
+                // std::cout << "x1 " << x << " y2 " << y << std::endl;
+                // std::cout << "x1 " << y << " y2 " << grid_width - x -1 << std::endl;
+                grid_h(grid_width - y - 1, x) = Cell::ALIVE;
             } else {
                 grid_width = new_width;
                 grid_height = new_height;
@@ -652,7 +646,7 @@ Grid Grid::rotate(int rotation) {
                 //std::cout << "New " << get_index(y, grid_width - x -1) << std::endl;
                 //std::cout << "x1 " << x << " y1 " << y << std::endl;
                 //std::cout << "x2 " << y << " y2 " << grid_width - x -1 << std::endl;
-                grid_h(grid_width - x - 1, y) = Cell::DEAD;
+                grid_h(grid_width - y - 1, x) = Cell::DEAD;
             }
         }
     }
