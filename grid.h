@@ -60,7 +60,7 @@ public:
 
     void resize(int width, int height);
 
-    char get(int x, int y) const;
+    int get(int x, int y) const;
 
     Cell & operator()(int x, int y) const;
 
