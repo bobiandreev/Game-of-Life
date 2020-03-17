@@ -13,6 +13,7 @@
  */
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include "grid.h"
 
 // Include the minimal number of headers needed to support your implementation.
@@ -683,27 +684,27 @@ Grid Grid::rotate(int rotation) {
  *      Returns a reference to the output stream to enable operator chaining.
  */
 
-void Grid::print(Grid grid) {
-    std::cout << '+';
+std::ostream & operator << (std::ostream &stream, Grid grid) {
+    stream << '+';
     for (int i = 0; i < grid.get_width(); ++i) {
-        std::cout << '-';
+        stream << '-';
     }
-    std::cout << '+' << std::endl;
+    stream << '+' << std::endl;
     for (int y = 0; y < grid.get_height(); ++y) {
-        std::cout << '|';
+        stream << '|';
         for (int x = 0; x < grid.get_width(); ++x) {
             if (grid.get(x, y) == '#') {
-                std::cout << '#';
+                stream << '#';
             } else {
-                std::cout << '.';
+                stream << ' ';
             }
         }
-        std::cout << '|' << std::endl;
+        stream << '|' << std::endl;
     }
-    std::cout << '+';
+    stream << '+';
     for (int i = 0; i < grid.get_width(); ++i) {
-        std::cout << '-';
+        stream << '-';
     }
-    std::cout << '+' << std::endl;
-
+    stream << '+' << std::endl;
+    return stream;
 }

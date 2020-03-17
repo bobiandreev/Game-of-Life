@@ -68,7 +68,6 @@ public:
 
     Grid rotate(int rotation);
 
-    void print(Grid grid);
-    
+    friend std::ostream &operator << (std::ostream &stream, Grid grid);
 
 };
