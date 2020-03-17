@@ -68,6 +68,8 @@ public:
 
     Grid crop(int x0, int y0, int x1, int y1) const;
 
+    void merge(Grid grid, int x0, int y0, bool alive_only = false);
+
     Grid rotate(int rotation);
 
     friend std::ostream &operator << (std::ostream &stream, Grid grid);
