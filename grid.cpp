@@ -527,6 +527,31 @@ Cell &Grid::operator()(int x, int y) const {
  *      or if the crop window has a negative size.
  */
 
+Grid Grid::crop(int x0, int y0, int x1, int y1) const {
+    int new_grid_height = x1 - x0;
+    int new_grid_width = y1 - y0;
+
+    Grid new_grid(new_grid_width, new_grid_height);
+
+    for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < new_grid.get_total_cells(); ++i, ++x, ++j) {
+        if (x >= x1) {
+            x = x0;
+            y++;
+        }
+
+        if (j >= new_grid.get_width()) {
+            j = 0;
+            z++;
+        }
+
+        if (get(x, y) == Cell::ALIVE) {
+            new_grid(j, z) = Cell::ALIVE;
+        } else {
+            new_grid(j, z) = Cell::DEAD;
+        }
+    }
+    return new_grid;
+}
 
 /**
  * Grid::merge(other, x0, y0, alive_only = false)
@@ -684,7 +709,7 @@ Grid Grid::rotate(int rotation) {
  *      Returns a reference to the output stream to enable operator chaining.
  */
 
-std::ostream & operator << (std::ostream &stream, Grid grid) {
+std::ostream &operator<<(std::ostream &stream, Grid grid) {
     stream << '+';
     for (int i = 0; i < grid.get_width(); ++i) {
         stream << '-';
