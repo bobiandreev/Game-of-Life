@@ -12,7 +12,9 @@
 
 // Add the minimal number of includes you need in order to declare the class.
 // #include ...
-
+#include <iostream>
+#include <algorithm>
+#include <sstream>
 
 /**
  * A Cell is a char limited to two named values for Cell::DEAD and Cell::ALIVE.
@@ -40,7 +42,7 @@ private:
 
 public:
 
-    Grid();
+    explicit Grid();
 
     explicit Grid(int square_grid_size);
 

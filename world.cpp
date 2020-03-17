@@ -22,6 +22,9 @@
  * @date March, 2020
  */
 #include "world.h"
+#include <iostream>
+#include <algorithm>
+#include <sstream>
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -37,7 +40,7 @@
  *      World world;
  *
  */
-
+World::World() : world_width(0), world_height(0) {}
 
 /**
  * World::World(square_size)
@@ -59,6 +62,12 @@
  *      The edge size to use for the width and height of the world.
  */
 
+World::World(int square_size) : world_width(square_size), world_height(square_size) {
+    world_cell_array = new Cell[get_total_cells()];
+    for (int i = 0; i < get_total_cells(); ++i) {
+        world_cell_array[i] = Cell::DEAD;
+    }
+}
 
 /**
  * World::World(width, height)
@@ -76,6 +85,12 @@
  *      The height of the world.
  */
 
+World::World(int width, int height) : world_width(width), world_height(height) {
+    world_cell_array = new Cell[get_total_cells()];
+    for (int i = 0; i < get_total_cells(); ++i) {
+        world_cell_array[i] = Cell::DEAD;
+    }
+}
 
 /**
  * World::World(initial_state)
@@ -97,6 +112,16 @@
  *      The state of the constructed world.
  */
 
+World::World(Grid grid) : world_width(grid.get_width()), world_height(grid.get_height()) {
+    world_cell_array = new Cell[get_total_cells()];
+    for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
+        if (x >= grid.get_width()) {
+            x = 0;
+            y++;
+        }
+        world_cell_array[i] = static_cast<Cell>(grid.get(x, y));
+    }
+}
 
 /**
  * World::get_width()
@@ -122,6 +147,9 @@
  *      The width of the world.
  */
 
+const int &World::get_width() const {
+    return world_width;
+}
 
 /**
  * World::get_height()
@@ -146,7 +174,9 @@
  * @return
  *      The height of the world.
  */
-
+const int & World::get_height() const {
+    return world_height;
+}
 
 /**
  * World::get_total_cells()
@@ -172,6 +202,9 @@
  *      The number of total cells.
  */
 
+int World::get_total_cells() const {
+    return world_height * world_width;
+}
 
 /**
  * World::get_alive_cells()
@@ -197,6 +230,15 @@
  *      The number of alive cells.
  */
 
+int World::get_alive_cells() const {
+    int count = 0;
+    for (int i = 0; i < get_total_cells(); i++) {
+        if (char(world_cell_array[i]) == '#') {
+            count++;
+        }
+    }
+    return count;
+}
 
 /**
  * World::get_dead_cells()
@@ -221,6 +263,16 @@
  * @return
  *      The number of dead cells.
  */
+
+int World::get_dead_cells() const {
+    int count = 0;
+    for (int i = 0; i < get_total_cells(); i++) {
+        if (char(world_cell_array[i]) == ' ') {
+            count++;
+        }
+    }
+    return count;
+}
 
 
 /**
