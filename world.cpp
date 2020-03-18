@@ -21,10 +21,8 @@
  * @author 958753
  * @date March, 2020
  */
+
 #include "world.h"
-#include <iostream>
-#include <algorithm>
-#include <sstream>
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -40,7 +38,7 @@
  *      World world;
  *
  */
-World::World() : world_width(0), world_height(0) {}
+World::World() : current_state(Grid()) {}
 
 /**
  * World::World(square_size)
@@ -62,12 +60,7 @@ World::World() : world_width(0), world_height(0) {}
  *      The edge size to use for the width and height of the world.
  */
 
-World::World(int square_size) : world_width(square_size), world_height(square_size) {
-    world_cell_array = new Cell[get_total_cells()];
-    for (int i = 0; i < get_total_cells(); ++i) {
-        world_cell_array[i] = Cell::DEAD;
-    }
-}
+World::World(int square_size) : current_state(Grid(square_size)) {}
 
 /**
  * World::World(width, height)
@@ -85,12 +78,7 @@ World::World(int square_size) : world_width(square_size), world_height(square_si
  *      The height of the world.
  */
 
-World::World(int width, int height) : world_width(width), world_height(height) {
-    world_cell_array = new Cell[get_total_cells()];
-    for (int i = 0; i < get_total_cells(); ++i) {
-        world_cell_array[i] = Cell::DEAD;
-    }
-}
+World::World(int width, int height) : current_state(Grid(width, height)) {}
 
 /**
  * World::World(initial_state)
@@ -112,16 +100,7 @@ World::World(int width, int height) : world_width(width), world_height(height) {
  *      The state of the constructed world.
  */
 
-World::World(Grid grid) : world_width(grid.get_width()), world_height(grid.get_height()) {
-    world_cell_array = new Cell[get_total_cells()];
-    for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
-        if (x >= grid.get_width()) {
-            x = 0;
-            y++;
-        }
-        world_cell_array[i] = static_cast<Cell>(grid.get(x, y));
-    }
-}
+World::World(Grid grid) : current_state(grid) {}
 
 /**
  * World::get_width()
@@ -148,7 +127,7 @@ World::World(Grid grid) : world_width(grid.get_width()), world_height(grid.get_h
  */
 
 const int &World::get_width() const {
-    return world_width;
+    return current_state.get_width();
 }
 
 /**
@@ -174,8 +153,8 @@ const int &World::get_width() const {
  * @return
  *      The height of the world.
  */
-const int & World::get_height() const {
-    return world_height;
+const int &World::get_height() const {
+    return current_state.get_height();
 }
 
 /**
@@ -203,7 +182,7 @@ const int & World::get_height() const {
  */
 
 int World::get_total_cells() const {
-    return world_height * world_width;
+    return current_state.get_height() * current_state.get_width();
 }
 
 /**
@@ -231,13 +210,7 @@ int World::get_total_cells() const {
  */
 
 int World::get_alive_cells() const {
-    int count = 0;
-    for (int i = 0; i < get_total_cells(); i++) {
-        if (char(world_cell_array[i]) == '#') {
-            count++;
-        }
-    }
-    return count;
+    return current_state.get_alive_cells();
 }
 
 /**
@@ -265,13 +238,7 @@ int World::get_alive_cells() const {
  */
 
 int World::get_dead_cells() const {
-    int count = 0;
-    for (int i = 0; i < get_total_cells(); i++) {
-        if (char(world_cell_array[i]) == ' ') {
-            count++;
-        }
-    }
-    return count;
+    return current_state.get_dead_cells();
 }
 
 
@@ -300,6 +267,10 @@ int World::get_dead_cells() const {
  *      A reference to the current state.
  */
 
+const Grid &World::get_state() const {
+    return current_state;
+}
+
 
 /**
  * World::resize(square_size)
@@ -321,6 +292,9 @@ int World::get_dead_cells() const {
  *      The new edge size for both the width and height of the grid.
  */
 
+void World::resize(int square_size) {
+    resize(square_size, square_size);
+}
 
 /**
  * World::resize(new_width, new_height)
@@ -345,6 +319,9 @@ int World::get_dead_cells() const {
  *      The new height for the grid.
  */
 
+void World::resize(int width, int height) {
+    current_state.resize(width,height);
+}
 
 /**
  * World::count_neighbours(x, y, toroidal)

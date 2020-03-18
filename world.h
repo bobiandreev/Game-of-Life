@@ -26,10 +26,6 @@ class World {
 private:
     Grid current_state;
     Grid next_state;
-    int world_width;
-    int world_height;
-
-    Cell *world_cell_array;
 
 public:
     explicit World();
@@ -41,4 +37,7 @@ public:
     int get_total_cells() const;
     int get_alive_cells() const;
     int get_dead_cells() const;
+    void resize(int square_size);
+    void resize(int width, int height);
+    const Grid & get_state() const;
 };
