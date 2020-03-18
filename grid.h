@@ -33,12 +33,14 @@ class Grid {
     //      Step 2. Draw the rest of the owl.
 private:
 
-    int grid_height;
     int grid_width;
+    int grid_height;
+
 
     Cell *cells_arr;
 
     int get_index(int x, int y) const;
+
 
 public:
 
@@ -75,5 +77,7 @@ public:
     Grid rotate(int rotation);
 
     friend std::ostream &operator << (std::ostream &stream, Grid grid);
+
+    bool areValid(int x, int y) const;
 
 };

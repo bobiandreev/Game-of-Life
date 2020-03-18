@@ -320,7 +320,7 @@ void World::resize(int square_size) {
  */
 
 void World::resize(int width, int height) {
-    current_state.resize(width,height);
+    current_state.resize(width, height);
 }
 
 /**
@@ -355,6 +355,52 @@ void World::resize(int width, int height) {
  *      Returns the number of alive neighbours.
  */
 
+int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
+    int counter = 0;    // initializing counter
+    int neighbours_size = 3 * 3;    // storing the calculated neighbour size
+
+    for (int i = 0, x = x_cent - 1, y = y_cent - 1; i < neighbours_size; ++i, ++x) {
+        if (!toroidal) {    // if toroidal is false
+
+            if (current_state.areValid(x, y)) {
+                if (x != x_cent || y != y_cent) {
+                    if (current_state.get(x, y) == Cell::ALIVE) {
+                        counter++;
+                    }
+                }
+            }
+
+        } else { // if toroidal is true
+            if (current_state.areValid(x, y)) {     // if there is no wrapping around edges
+                if (x != x_cent || y != y_cent) {
+                    if (current_state.get(x, y) == Cell::ALIVE) {
+                        counter++;
+                    }
+                }
+
+            } else { // if there is wrapping around edges
+                int tor_x = x;
+                int tor_y = y;
+                if (x < 0) {
+                    tor_x = current_state.get_width() + x;
+                }
+                if (y < 0) {
+                    tor_y = current_state.get_height() + y;
+                    int height = current_state.get_height();
+                }
+                if (current_state.get(tor_x, tor_y) == Cell::ALIVE) {
+                    counter++;
+                }
+            }
+        }
+
+        if (x >= x_cent + 1) { // updates x and y
+            x = x_cent - 2;
+            y++;
+        }
+    }
+    return counter;
+}
 
 /**
  * World::step(toroidal)

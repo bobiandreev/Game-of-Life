@@ -27,6 +27,7 @@ private:
     Grid current_state;
     Grid next_state;
 
+    int count_neighbours(int x, int y, bool toroidal);
 public:
     explicit World();
     explicit World(int square_size);
@@ -40,4 +41,5 @@ public:
     void resize(int square_size);
     void resize(int width, int height);
     const Grid & get_state() const;
+
 };
