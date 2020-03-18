@@ -386,7 +386,6 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
                 }
                 if (y < 0) {
                     tor_y = current_state.get_height() + y;
-                    int height = current_state.get_height();
                 }
                 if (current_state.get(tor_x, tor_y) == Cell::ALIVE) {
                     counter++;
@@ -423,6 +422,31 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
  *      wraps to the right edge and the top to the bottom. Defaults to false.
  */
 
+void World::step(bool toroidal) {
+    next_state = Grid(current_state.get_width(), current_state.get_height());
+    for (int i = 0, x = 0, y = 0; i < current_state.get_total_cells(); ++i, ++x) {
+
+        if (x >= current_state.get_width()) {
+            x = 0;
+            y++;
+        }
+
+        if (count_neighbours(x, y, toroidal) < 2) {
+            next_state.set(x, y, Cell::DEAD);
+        } else if (count_neighbours(x, y, toroidal) > 3) {
+            next_state.set(x, y, Cell::DEAD);
+        } else if (count_neighbours(x, y, toroidal) == 2) {
+            if (current_state.get(x, y) == Cell::ALIVE) {
+                next_state.set(x, y, Cell::ALIVE);
+            } else {
+                next_state.set(x, y, Cell::DEAD);
+            }
+        } else if (count_neighbours(x, y, toroidal) == 3) {
+            next_state.set(x, y, Cell::ALIVE);
+        }
+    }
+    std::swap(current_state, next_state);
+}
 
 /**
  * World::advance(steps, toroidal)
@@ -437,3 +461,9 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
  *      Optional parameter. If true then the step will consider the grid as a torus, where the left edge
  *      wraps to the right edge and the top to the bottom. Defaults to false.
  */
+
+void World::advance(int steps, bool toroidal) {
+    for (int i = 0; i < steps; ++i) {
+        step(toroidal);
+    }
+}

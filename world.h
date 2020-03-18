@@ -41,5 +41,6 @@ public:
     void resize(int square_size);
     void resize(int width, int height);
     const Grid & get_state() const;
-
+    void step (bool toroidal = false);
+    void advance(int steps, bool toroidal = false);
 };
