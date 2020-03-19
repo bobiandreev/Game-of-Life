@@ -32,8 +32,7 @@
  *
  */
 
-Grid::Grid() : grid_width(0), grid_height(0) {
-}
+Grid::Grid() : grid_width(0), grid_height(0), cells_arr(new Cell[0]) {}
 
 /**
  * Grid::Grid(square_size)
@@ -59,8 +58,8 @@ Grid::Grid() : grid_width(0), grid_height(0) {
  *      The edge size to use for the width and height of the grid.
  */
 
-Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size) {
-    cells_arr = new Cell[get_total_cells()];
+Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size),
+                                   cells_arr(new Cell[get_total_cells()]) {
     for (int i = 0; i < get_total_cells(); ++i) {
         cells_arr[i] = Cell::DEAD;
     }
@@ -84,8 +83,7 @@ Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(squ
  *      The height of the grid.
  */
 
-Grid::Grid(int width, int height) : grid_width(width), grid_height(height) {
-    cells_arr = new Cell[get_total_cells()];
+Grid::Grid(int width, int height) : grid_width(width), grid_height(height), cells_arr(new Cell[get_total_cells()]) {
     for (int i = 0; i < get_total_cells(); ++i) {
         cells_arr[i] = Cell::DEAD;
     }
