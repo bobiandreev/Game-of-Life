@@ -362,7 +362,7 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
     for (int i = 0, x = x_cent - 1, y = y_cent - 1; i < neighbours_size; ++i, ++x) {
         if (!toroidal) {    // if toroidal is false
 
-            if (current_state.areValid(x, y)) {
+            if (current_state.are_valid_other(x, y)) {
                 if (x != x_cent || y != y_cent) {
                     if (current_state.get(x, y) == Cell::ALIVE) {
                         counter++;
@@ -371,7 +371,7 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
             }
 
         } else { // if toroidal is true
-            if (current_state.areValid(x, y)) {     // if there is no wrapping around edges
+            if (current_state.are_valid_other(x, y)) {     // if there is no wrapping around edges
                 if (x != x_cent || y != y_cent) {
                     if (current_state.get(x, y) == Cell::ALIVE) {
                         counter++;
@@ -381,12 +381,22 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
             } else { // if there is wrapping around edges
                 int tor_x = x;
                 int tor_y = y;
+
                 if (x < 0) {
                     tor_x = current_state.get_width() + x;
                 }
+                if (x >= current_state.get_width()) {
+                    tor_x = current_state.get_width() - x;
+                }
+
                 if (y < 0) {
                     tor_y = current_state.get_height() + y;
                 }
+                if (y >= current_state.get_height()) {
+                    tor_y = current_state.get_height() - y;
+                }
+
+
                 if (current_state.get(tor_x, tor_y) == Cell::ALIVE) {
                     counter++;
                 }
@@ -430,22 +440,23 @@ void World::step(bool toroidal) {
             x = 0;
             y++;
         }
-
-        if (count_neighbours(x, y, toroidal) < 2) {
+        int num_neighbours = count_neighbours(x, y, toroidal);
+        if (num_neighbours < 2) {
             next_state.set(x, y, Cell::DEAD);
-        } else if (count_neighbours(x, y, toroidal) > 3) {
+        } else if (num_neighbours > 3) {
             next_state.set(x, y, Cell::DEAD);
-        } else if (count_neighbours(x, y, toroidal) == 2) {
+        } else if (num_neighbours == 2) {
             if (current_state.get(x, y) == Cell::ALIVE) {
                 next_state.set(x, y, Cell::ALIVE);
             } else {
                 next_state.set(x, y, Cell::DEAD);
             }
-        } else if (count_neighbours(x, y, toroidal) == 3) {
+        } else if (num_neighbours == 3) {
             next_state.set(x, y, Cell::ALIVE);
         }
     }
     std::swap(current_state, next_state);
+    //std::cout << get_state() << std::endl;
 }
 
 /**

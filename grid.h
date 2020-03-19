@@ -66,7 +66,7 @@ public:
 
     int get(int x, int y) const;
 
-    Cell & operator()(int x, int y) const;
+    Cell &operator()(int x, int y) const;
 
     void set(int X, int Y, int value) const;
 
@@ -76,8 +76,12 @@ public:
 
     Grid rotate(int rotation);
 
-    friend std::ostream &operator << (std::ostream &stream, Grid grid);
+    friend std::ostream &operator<<(std::ostream &stream, Grid grid);
 
-    bool areValid(int x, int y) const;
+    bool are_valid(int x, int y) const;
+
+    bool are_valid_crop(int x, int y) const;
+
+    bool are_valid_other(int x, int y) const;
 
 };

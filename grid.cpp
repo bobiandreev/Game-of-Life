@@ -291,8 +291,14 @@ void Grid::resize(int square_size) {
 void Grid::resize(int width, int height) {
     int old_height = grid_height;
     int old_width = grid_width;
-    Cell *new_grid = new Cell[width * height];
-    for (int i = 0, x = 0, y = 0; i < width * height; ++i, ++y) {
+    int num_cells_new;
+    if (grid_width == 0 || grid_height == 0) {
+        num_cells_new = grid_width + grid_height;
+    } else {
+        num_cells_new = width * height;
+    }
+    Cell *new_grid = new Cell[num_cells_new];
+    for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, ++y) {
         if (y >= width) {
             y = 0;
             x++;
@@ -308,11 +314,11 @@ void Grid::resize(int width, int height) {
             new_grid[i] = Cell::DEAD;
         }
     }
-    delete[] cells_arr;
-    cells_arr = new_grid;
+    std::swap(cells_arr, new_grid);
     grid_height = height;
     grid_width = width;
-    new_grid = nullptr;
+    delete new_grid;
+
 }
 
 
@@ -399,7 +405,7 @@ int Grid::get(int x, int y) const {
  */
 
 void Grid::set(int x, int y, int value) const {
-    if (areValid(x, y)) {
+    if (are_valid_other(x, y)) {
         operator()(x, y) = static_cast<Cell>(value);
     } else {
         throw std::runtime_error("Coordinates not valid");
@@ -443,7 +449,7 @@ void Grid::set(int x, int y, int value) const {
  */
 
 Cell &Grid::operator()(int x, int y) const {
-    if (areValid(x, y)) {
+    if (are_valid_other(x, y)) {
         int index = get_index(x, y);
         return cells_arr[index];
     } else {
@@ -520,7 +526,7 @@ Cell &Grid::operator()(int x, int y) const {
 
 Grid Grid::crop(int x0, int y0, int x1, int y1) const {
 
-    if (!areValid(x0, y0) || !areValid(x1, y1)) {
+    if (!are_valid_crop(x0, y0) || !are_valid_crop(x1, y1)) {
         throw std::range_error("Grid is not in the required ranges.");
     } else {
 
@@ -589,7 +595,7 @@ Grid Grid::crop(int x0, int y0, int x1, int y1) const {
  */
 
 void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
-    if (!areValid(x0 + grid.get_width(), y0 + grid.get_height())) {
+    if (!are_valid_crop(x0 + grid.get_width(), y0 + grid.get_height())) {
         throw std::range_error("Grid is not in the required ranges.");
     } else {
 
@@ -760,7 +766,7 @@ std::ostream &operator<<(std::ostream &stream, Grid grid) {
 /**
  * bool::areValid(int x, int y)
  *
- * Private helper method which is used to check if the provided coordinates x (width)
+ * Public helper method which is used to check if the provided coordinates x (width)
  * and y (height) are valid coordinates in the given grid.
  *
  * @example
@@ -781,12 +787,26 @@ std::ostream &operator<<(std::ostream &stream, Grid grid) {
  *         True if both coordinates are in the current grid, false otherwise.
  */
 
-bool Grid::areValid(int x, int y) const {
-    if (x > grid_width || y > grid_height) {
-        return false;
-    } else if (x < 0 || y < 0) {
+bool Grid::are_valid(int x, int y) const {
+    if (x < 0 || y < 0) {
         return false;
     } else {
         return true;
+    }
+}
+
+bool Grid::are_valid_crop(int x, int y) const {
+    if (x > grid_width || y > grid_height) {
+        return false;
+    } else {
+        return are_valid(x, y);
+    }
+}
+
+bool Grid::are_valid_other(int x, int y) const {
+    if (x >= grid_width || y >= grid_height) {
+        return false;
+    } else {
+        return are_valid(x, y);
     }
 }
