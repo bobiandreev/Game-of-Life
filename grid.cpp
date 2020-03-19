@@ -291,12 +291,13 @@ void Grid::resize(int width, int height) {
     int old_width = grid_width;
     int num_cells_new;
     if (grid_width == 0 || grid_height == 0) {
-        num_cells_new = grid_width + grid_height;
+        num_cells_new = width + height;
     } else {
         num_cells_new = width * height;
     }
     Cell *new_grid = new Cell[num_cells_new];
     for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, ++y) {
+
         if (y >= width) {
             y = 0;
             x++;
@@ -315,8 +316,8 @@ void Grid::resize(int width, int height) {
     std::swap(cells_arr, new_grid);
     grid_height = height;
     grid_width = width;
-    delete new_grid;
-
+    delete[] new_grid;
+    new_grid = nullptr;
 }
 
 
