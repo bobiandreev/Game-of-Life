@@ -5,19 +5,16 @@
 #include <iostream>
 #include "grid.h"
 #include "world.h"
+#include "zoo.h"
 
 int main(int argc, char *argv[]) {
-    Grid g(6);
+//    std::cout << Zoo::glider() << std::endl;
+//    std::cout << Zoo::r_pentomino() << std::endl;
+//    std::cout << Zoo::light_weight_spaceship() << std::endl;
 
-    g.set(1, 3, Cell::ALIVE);
-    g.set(2, 3, Cell::ALIVE);
-    g.set(3, 3, Cell::ALIVE);
-    g.set(3, 2, Cell::ALIVE);
-    g.set(2, 1, Cell::ALIVE);
-
-    World w(g);
-    std::cout << w.get_state() << std::endl;
-    w.advance(12,false);
-    std::cout << w.get_state() << std::endl;
+  //  std::cout << Zoo::load_ascii("../test_inputs/GLIDER.gol");
+    //Grid grid = Zoo::load_ascii("../test_inputs/GLIDER.gol");
+    Grid grid;
+    Zoo::save_ascii("../test_outputs/SAVE_ASCII_GLIDER_NOTHROW.gol", grid);
 }
 

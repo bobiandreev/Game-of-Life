@@ -22,8 +22,10 @@
  * @date March, 2020
  */
 #include <fstream>
+#include <sys/stat.h>
 #include "zoo.h"
 #include "grid.h"
+
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -158,30 +160,57 @@ Grid Zoo::load_ascii(std::string path) {
 
     std::ifstream inFile(path);
 
+    if (!inFile.is_open()) {
+        throw std::invalid_argument("File not found.");
+    }
+
     int width;
     int height;
     char character;
 
     inFile >> width;
     inFile >> height;
-    Grid grid(width, height);
+
+    if (width < 0 || height < 0) {
+        inFile.close();
+        throw std::invalid_argument("Width or height less than 0.");
+    }
+
     inFile.get(character);
-//    std::string line;
-//    while (std::getline(std::cin, line)) {
-//        std::cout << line << "\n";
-//    }
-    char line[width];
+
+    if (character != '\n' && character != '\r' && character != '\000') {
+        inFile.close();
+        throw std::invalid_argument("Malformed newline.");
+    }
+
+    Grid grid(width, height);
+    char line[width + 1];
+
     for (int i = 0, x = 0, y = 0; i < grid.get_height(); ++i) {
-        inFile.getline(line, 7);
+        inFile.getline(line, grid.get_width() + 1);
+
         for (int j = 0; j < grid.get_width(); ++j) {
+
+            if (line[j] != char(Cell::DEAD) && line[j] != char(Cell::ALIVE)) {
+                inFile.close();
+                throw std::invalid_argument("Incorrect cell value.");
+            }
+
             if (line[j] == char(Cell::ALIVE)) {
                 grid.set(x, y, Cell::ALIVE);
             }
+
             x++;
+        }
+
+        if (line[width + 1] != '\n' && line[width + 1] != '\r' && line[width + 1] != '\000') {
+            inFile.close();
+            throw std::invalid_argument("Malformed newline.");
         }
         x = 0;
         y++;
     }
+    inFile.close();
     return grid;
 }
 
@@ -213,6 +242,22 @@ Grid Zoo::load_ascii(std::string path) {
  * @throws
  *      Throws std::runtime_error or sub-class if the file cannot be opened.
  */
+
+void Zoo::save_ascii(std::string path, Grid grid) {
+    std::ofstream outFile(path);
+    if (!outFile.is_open()) {
+        throw std::invalid_argument("No such path");
+    }
+    outFile << grid.get_width() << " ";
+    outFile << grid.get_height() << std::endl;
+
+    for (int y = 0; y < grid.get_height(); ++y) {
+        for (int x = 0; x < grid.get_width(); ++x) {
+            outFile << char(grid.get(x, y));
+        }
+        outFile << std::endl;
+    }
+}
 
 
 /**
