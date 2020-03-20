@@ -360,7 +360,7 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
     int neighbours_size = 3 * 3;    // storing the calculated neighbour size
 
     for (int i = 0, x = x_cent - 1, y = y_cent - 1; i < neighbours_size; ++i, ++x) {
-        if (!toroidal) {    // if toroidal is false
+        if (!toroidal) {// if toroidal is false
 
             if (current_state.are_valid_other(x, y)) {
                 if (x != x_cent || y != y_cent) {
@@ -371,6 +371,7 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
             }
 
         } else { // if toroidal is true
+
             if (current_state.are_valid_other(x, y)) {     // if there is no wrapping around edges
                 if (x != x_cent || y != y_cent) {
                     if (current_state.get(x, y) == Cell::ALIVE) {
@@ -383,19 +384,16 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
                 int tor_y = y;
 
                 if (x < 0) {
-                    tor_x = current_state.get_width() + x;
-                }
-                if (x >= current_state.get_width()) {
-                    tor_x = current_state.get_width() - x;
+                    tor_x = current_state.get_width() + x;              // checks if the x coordinate is less than 0
+                } else if (x >= current_state.get_width()) {            // or more than the width to when wrapping
+                    tor_x = current_state.get_width() - x;              // around edges
                 }
 
                 if (y < 0) {
-                    tor_y = current_state.get_height() + y;
+                    tor_y = current_state.get_height() + y;             // checks if the y coordinate is less than 0
+                } else if (y >= current_state.get_height()) {           // or more than the height to when wrapping
+                    tor_y = current_state.get_height() - y;             // around edges
                 }
-                if (y >= current_state.get_height()) {
-                    tor_y = current_state.get_height() - y;
-                }
-
 
                 if (current_state.get(tor_x, tor_y) == Cell::ALIVE) {
                     counter++;
@@ -434,29 +432,37 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
 
 void World::step(bool toroidal) {
     next_state = Grid(current_state.get_width(), current_state.get_height());
+
     for (int i = 0, x = 0, y = 0; i < current_state.get_total_cells(); ++i, ++x) {
 
         if (x >= current_state.get_width()) {
             x = 0;
             y++;
         }
+
         int num_neighbours = count_neighbours(x, y, toroidal);
+
         if (num_neighbours < 2) {
             next_state.set(x, y, Cell::DEAD);
-        } else if (num_neighbours > 3) {
+        }
+
+        else if (num_neighbours > 3) {
             next_state.set(x, y, Cell::DEAD);
-        } else if (num_neighbours == 2) {
+        }
+
+        else if (num_neighbours == 2) {
             if (current_state.get(x, y) == Cell::ALIVE) {
                 next_state.set(x, y, Cell::ALIVE);
             } else {
                 next_state.set(x, y, Cell::DEAD);
             }
-        } else if (num_neighbours == 3) {
+        }
+
+        else if (num_neighbours == 3) {
             next_state.set(x, y, Cell::ALIVE);
         }
     }
     std::swap(current_state, next_state);
-    //std::cout << get_state() << std::endl;
 }
 
 /**

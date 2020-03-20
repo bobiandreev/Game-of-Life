@@ -21,7 +21,9 @@
  * @author 958753
  * @date March, 2020
  */
+#include <fstream>
 #include "zoo.h"
+#include "grid.h"
 
 // Include the minimal number of headers needed to support your implementation.
 // #include ...
@@ -47,6 +49,15 @@
  *      Returns a Grid containing a glider.
  */
 
+Grid Zoo::glider() {
+    Grid glider(3);
+    glider.set(1, 0, Cell::ALIVE);
+    glider.set(2, 1, Cell::ALIVE);
+    glider.set(0, 2, Cell::ALIVE);
+    glider.set(1, 2, Cell::ALIVE);
+    glider.set(2, 2, Cell::ALIVE);
+    return glider;
+}
 
 /**
  * Zoo::r_pentomino()
@@ -69,11 +80,22 @@
  *      Returns a Grid containing a r-pentomino.
  */
 
+Grid Zoo::r_pentomino() {
+    Grid r_pentomino(3);
+
+    r_pentomino.set(1, 0, Cell::ALIVE);
+    r_pentomino.set(2, 0, Cell::ALIVE);
+    r_pentomino.set(0, 1, Cell::ALIVE);
+    r_pentomino.set(1, 1, Cell::ALIVE);
+    r_pentomino.set(1, 2, Cell::ALIVE);
+
+    return r_pentomino;
+}
 
 /**
  * Zoo::light_weight_spaceship()
  *
- * Construct a 3x3 grid containing a light weight spaceship.
+ * Construct a 5x4 grid containing a light weight spaceship.
  * https://www.conwaylife.com/wiki/Lightweight_spaceship
  *
  * @example
@@ -92,6 +114,20 @@
  *      Returns a grid containing a light weight spaceship.
  */
 
+Grid Zoo::light_weight_spaceship() {
+    Grid light_weight_spaceship(5, 4);
+
+    light_weight_spaceship.set(1, 0, Cell::ALIVE);
+    light_weight_spaceship.set(4, 0, Cell::ALIVE);
+    light_weight_spaceship.set(0, 1, Cell::ALIVE);
+    light_weight_spaceship.set(0, 2, Cell::ALIVE);
+    light_weight_spaceship.set(4, 2, Cell::ALIVE);
+    for (int i = 0; i < 4; ++i) {
+        light_weight_spaceship.set(i, 3, Cell::ALIVE);
+    }
+
+    return light_weight_spaceship;
+}
 
 /**
  * Zoo::load_ascii(path)
@@ -118,6 +154,36 @@
  *          - The character for a cell is not the ALIVE or DEAD character.
  */
 
+Grid Zoo::load_ascii(std::string path) {
+
+    std::ifstream inFile(path);
+
+    int width;
+    int height;
+    char character;
+
+    inFile >> width;
+    inFile >> height;
+    Grid grid(width, height);
+    inFile.get(character);
+//    std::string line;
+//    while (std::getline(std::cin, line)) {
+//        std::cout << line << "\n";
+//    }
+    char line[width];
+    for (int i = 0, x = 0, y = 0; i < grid.get_height(); ++i) {
+        inFile.getline(line, 7);
+        for (int j = 0; j < grid.get_width(); ++j) {
+            if (line[j] == char(Cell::ALIVE)) {
+                grid.set(x, y, Cell::ALIVE);
+            }
+            x++;
+        }
+        x = 0;
+        y++;
+    }
+    return grid;
+}
 
 /**
  * Zoo::save_ascii(path, grid)
