@@ -15,6 +15,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <vector>
 
 /**
  * A Cell is a char limited to two named values for Cell::DEAD and Cell::ALIVE.
@@ -37,7 +38,7 @@ private:
     int grid_height;
 
 
-    Cell *cells_arr;
+    std::vector<Cell> cells_arr;
 
     int get_index(int x, int y) const;
 
@@ -66,9 +67,11 @@ public:
 
     int get(int x, int y) const;
 
-    Cell &operator()(int x, int y) const;
+    Cell &operator()(int x, int y);
 
-    void set(int X, int Y, int value) const;
+    const Cell &operator()(int x, int y) const;
+
+    void set(int X, int Y, int value);
 
     Grid crop(int x0, int y0, int x1, int y1) const;
 

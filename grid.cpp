@@ -32,7 +32,7 @@
  *
  */
 
-Grid::Grid() : grid_width(0), grid_height(0), cells_arr(new Cell[0]) {}
+Grid::Grid() : grid_width(0), grid_height(0), cells_arr(0) {}
 
 /**
  * Grid::Grid(square_size)
@@ -59,7 +59,7 @@ Grid::Grid() : grid_width(0), grid_height(0), cells_arr(new Cell[0]) {}
  */
 
 Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(square_grid_size),
-                                   cells_arr(new Cell[get_total_cells()]) {
+                                   cells_arr(get_total_cells()) {
     for (int i = 0; i < get_total_cells(); ++i) {
         cells_arr[i] = Cell::DEAD;
     }
@@ -83,7 +83,7 @@ Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(squ
  *      The height of the grid.
  */
 
-Grid::Grid(int width, int height) : grid_width(width), grid_height(height), cells_arr(new Cell[get_total_cells()]) {
+Grid::Grid(int width, int height) : grid_width(width), grid_height(height), cells_arr(get_total_cells()) {
     for (int i = 0; i < get_total_cells(); ++i) {
         cells_arr[i] = Cell::DEAD;
     }
@@ -295,7 +295,7 @@ void Grid::resize(int width, int height) {
     } else {
         num_cells_new = width * height;
     }
-    Cell *new_grid = new Cell[num_cells_new];
+    std::vector<Cell> new_grid(num_cells_new);
     for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, ++y) {
 
         if (y >= width) {
@@ -316,8 +316,6 @@ void Grid::resize(int width, int height) {
     std::swap(cells_arr, new_grid);
     grid_height = height;
     grid_width = width;
-    delete[] new_grid;
-    new_grid = nullptr;
 }
 
 
@@ -403,7 +401,7 @@ int Grid::get(int x, int y) const {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 
-void Grid::set(int x, int y, int value) const {
+void Grid::set(int x, int y, int value) {
     if (are_valid_other(x, y)) {
         operator()(x, y) = static_cast<Cell>(value);
     } else {
@@ -447,10 +445,9 @@ void Grid::set(int x, int y, int value) const {
  *      std::runtime_error or sub-class if x,y is not a valid coordinate within the grid.
  */
 
-Cell &Grid::operator()(int x, int y) const {
+Cell &Grid::operator()(int x, int y) {
     if (are_valid_other(x, y)) {
-        int index = get_index(x, y);
-        return cells_arr[index];
+        return cells_arr[get_index(x, y)];
     } else {
         throw std::runtime_error("Coordinates not valid");
     }
@@ -486,7 +483,13 @@ Cell &Grid::operator()(int x, int y) const {
  * @throws
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
-
+const Cell &Grid::operator()(int x, int y) const {
+    if (are_valid_other(x, y)) {
+        return cells_arr[get_index(x, y)];
+    } else {
+        throw std::runtime_error("Coordinates are invalid.");
+    }
+}
 
 /**
  * Grid::crop(x0, y0, x1, y1)
@@ -668,7 +671,7 @@ Grid Grid::rotate(int rotation) {
 
     if (rotation_state == 2 || rotation_state == -2) {
         Grid grid_h(get_width(), get_height());
-        std::reverse(cells_arr, cells_arr + get_total_cells());
+        std::reverse(cells_arr.begin(), cells_arr.end());
         for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
             if (x >= grid_width) {
                 x = 0;
@@ -676,7 +679,7 @@ Grid Grid::rotate(int rotation) {
             }
             grid_h(x, y) = cells_arr[i];
         }
-        std::reverse(cells_arr, cells_arr + get_total_cells());
+        std::reverse(cells_arr.begin(), cells_arr.end());
         return grid_h;
     }
 

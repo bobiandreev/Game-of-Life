@@ -292,8 +292,6 @@ Grid Zoo::load_binary(std::string path) {
         throw std::invalid_argument("File not found");
     }
 
-//    using byte = unsigned char;
-//    constexpr std::size_t BITS_PER_BYTE = std::numeric_limits<byte>::digits;
     using bits_in_byte = std::bitset<8>;
 
     int width;
@@ -364,20 +362,17 @@ Grid Zoo::load_binary(std::string path) {
  */
 
 void Zoo::save_binary(std::string path, Grid grid) {
+
     std::ofstream out_file(path, std::ios::binary);
 
     if (!out_file.is_open()) {
         throw std::invalid_argument("No such path.");
     }
 
-//    using byte = unsigned char;
-//    constexpr std::size_t BITS_PER_BYTE = std::numeric_limits<byte>::digits;
     using bits_in_byte = std::bitset<8>;
-
 
     out_file.write(reinterpret_cast<const char *>(&grid.get_width()), 4);
     out_file.write(reinterpret_cast<const char *>(&grid.get_height()), 4);
-
 
     std::string temp;
     for (int i = 0, x = 0, y = 0; i < grid.get_total_cells(); ++i, ++x) {
