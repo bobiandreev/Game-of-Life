@@ -23,6 +23,7 @@
  */
 #include <fstream>
 #include <sys/stat.h>
+#include <bitset>
 #include "zoo.h"
 #include "grid.h"
 
@@ -283,6 +284,55 @@ void Zoo::save_ascii(std::string path, Grid grid) {
  *          - The file ends unexpectedly.
  */
 
+Grid Zoo::load_binary(std::string path) {
+
+    std::ifstream in_file(path, std::ios::binary);
+
+    if (!in_file.is_open()) {
+        throw std::invalid_argument("File not found");
+    }
+
+//    using byte = unsigned char;
+//    constexpr std::size_t BITS_PER_BYTE = std::numeric_limits<byte>::digits;
+    using bits_in_byte = std::bitset<8>;
+
+    int width;
+    in_file.read(reinterpret_cast<char *>(&width), 4);
+    int height;
+    in_file.read(reinterpret_cast<char *>(&height), 4);
+
+    Grid grid(width, height);
+
+    std::string bit_string;
+    char c;
+
+    while (in_file.get(c)) {
+        std::string temp;
+        temp = bits_in_byte(c).to_string();
+        std::reverse(temp.begin(), temp.end());
+        bit_string += temp;
+    }
+
+    if (int(bit_string.length()) < grid.get_total_cells()) {
+        throw std::invalid_argument("Malformed file.");
+    }
+
+    for (int j = 0, x = 0, y = 0; j < grid.get_total_cells(); ++j, ++x) {
+
+        if (x >= grid.get_width()) {
+            x = 0;
+            ++y;
+        }
+
+        if (bit_string[j] == '1') {
+            grid.set(x, y, Cell::ALIVE);
+        } else {
+            grid.set(x, y, Cell::DEAD);
+        }
+    }
+    in_file.close();
+    return grid;
+}
 
 /**
  * Zoo::save_binary(path, grid)
@@ -313,3 +363,47 @@ void Zoo::save_ascii(std::string path, Grid grid) {
  *      Throws std::runtime_error or sub-class if the file cannot be opened.
  */
 
+void Zoo::save_binary(std::string path, Grid grid) {
+    std::ofstream out_file(path, std::ios::binary);
+
+    if (!out_file.is_open()) {
+        throw std::invalid_argument("No such path.");
+    }
+
+//    using byte = unsigned char;
+//    constexpr std::size_t BITS_PER_BYTE = std::numeric_limits<byte>::digits;
+    using bits_in_byte = std::bitset<8>;
+
+
+    out_file.write(reinterpret_cast<const char *>(&grid.get_width()), 4);
+    out_file.write(reinterpret_cast<const char *>(&grid.get_height()), 4);
+
+
+    std::string temp;
+    for (int i = 0, x = 0, y = 0; i < grid.get_total_cells(); ++i, ++x) {
+        if (x >= grid.get_width()) {
+            x = 0;
+            ++y;
+        }
+
+        if (grid.get(x, y) == Cell::ALIVE) {
+            temp += '1';
+        } else {
+            temp += '0';
+        }
+
+        if ((i + 1) % 8 == 0) {
+            std::reverse(temp.begin(), temp.end());
+            char cur_char = bits_in_byte(temp).to_ulong();
+            out_file.write((char *) &cur_char, sizeof(char));
+            temp.clear();
+        }
+    }
+
+    if (grid.get_total_cells() % 8 != 0) {
+        std::reverse(temp.begin(), temp.end());
+        char cur_char = bits_in_byte(temp).to_ulong();
+        out_file.write((char *) &cur_char, sizeof(char));
+    }
+    out_file.close();
+}

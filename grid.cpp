@@ -608,7 +608,7 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
             }
 
             if (alive_only != false) {
-                if (grid.get_index(j, z) == Cell::ALIVE) {
+                if (grid.get(j, z) == Cell::ALIVE) {
                     set(x, y, Cell::ALIVE);
                 }
             } else {
