@@ -290,11 +290,9 @@ void Grid::resize(int width, int height) {
     int old_height = grid_height;
     int old_width = grid_width;
     int num_cells_new;
-    if (grid_width == 0 || grid_height == 0) {
-        num_cells_new = width + height;
-    } else {
-        num_cells_new = width * height;
-    }
+
+    num_cells_new = width * height;
+
     std::vector<Cell> new_grid(num_cells_new);
     for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, ++y) {
 
@@ -647,13 +645,13 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
 
 Grid Grid::rotate(int rotation) {
     int rotation_state = rotation % 4;
-
+    Grid new_grid;
     if (rotation_state == 0) {
         return *this;
     }
 
     if (rotation_state == 1 || rotation_state == -3) {
-        Grid grid_h(grid_height, grid_width);
+        new_grid.resize(grid_height, grid_width);
 
         for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
             if (x >= grid_width) {
@@ -661,30 +659,28 @@ Grid Grid::rotate(int rotation) {
                 y++;
             }
             if (get(x, y) == Cell::ALIVE) {
-                grid_h(grid_height - y - 1, x) = Cell::ALIVE;
+                new_grid(grid_height - y - 1, x) = Cell::ALIVE;
             } else {
-                grid_h(grid_height - y - 1, x) = Cell::DEAD;
+                new_grid(grid_height - y - 1, x) = Cell::DEAD;
             }
         }
-        return grid_h;
+        return new_grid;
     }
 
     if (rotation_state == 2 || rotation_state == -2) {
-        Grid grid_h(get_width(), get_height());
-        std::reverse(cells_arr.begin(), cells_arr.end());
+        new_grid.resize(grid_width, grid_height);
         for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
             if (x >= grid_width) {
                 x = 0;
                 y++;
             }
-            grid_h(x, y) = cells_arr[i];
+            new_grid(x, y) = cells_arr[(get_total_cells() - i) - 1];
         }
-        std::reverse(cells_arr.begin(), cells_arr.end());
-        return grid_h;
+        return new_grid;
     }
 
     if (rotation_state == 3 || rotation_state == -1) {
-        Grid grid_h(grid_height, grid_width);
+        new_grid.resize(grid_height, grid_width);
 
         for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
             if (x >= grid_width) {
@@ -692,13 +688,13 @@ Grid Grid::rotate(int rotation) {
                 y++;
             }
             if (get(x, y) == Cell::ALIVE) {
-                grid_h(y, grid_width - x - 1) = Cell::ALIVE;
+                new_grid(y, grid_width - x - 1) = Cell::ALIVE;
             } else {
-                grid_h(y, grid_width - x - 1) = Cell::DEAD;
+                new_grid(y, grid_width - x - 1) = Cell::DEAD;
             }
 
         }
-        return grid_h;
+        return new_grid;
     }
     return *this;
 }
