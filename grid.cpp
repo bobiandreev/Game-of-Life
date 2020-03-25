@@ -643,60 +643,42 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
  *      Returns a copy of the grid that has been rotated.
  */
 
-Grid Grid::rotate(int rotation) {
+Grid Grid::rotate(int rotation) const {
     int rotation_state = rotation % 4;
-    Grid new_grid;
+
+    Grid new_grid(grid_height, grid_width);
+
+    if (rotation_state == 2 || rotation_state == -2) {
+        new_grid.resize(grid_width, grid_height);
+    }
+
     if (rotation_state == 0) {
         return *this;
     }
 
-    if (rotation_state == 1 || rotation_state == -3) {
-        new_grid.resize(grid_height, grid_width);
+    for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
 
-        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
-            if (x >= grid_width) {
-                x = 0;
-                y++;
-            }
+        if (x >= grid_width) {
+            x = 0;
+            y++;
+        }
+
+        if (rotation_state == 1 || rotation_state == -3) {
             if (get(x, y) == Cell::ALIVE) {
                 new_grid(grid_height - y - 1, x) = Cell::ALIVE;
-            } else {
-                new_grid(grid_height - y - 1, x) = Cell::DEAD;
             }
         }
-        return new_grid;
-    }
-
-    if (rotation_state == 2 || rotation_state == -2) {
-        new_grid.resize(grid_width, grid_height);
-        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
-            if (x >= grid_width) {
-                x = 0;
-                y++;
-            }
+        else if (rotation_state == 2 || rotation_state == -2) {
             new_grid(x, y) = cells_arr[(get_total_cells() - i) - 1];
         }
-        return new_grid;
-    }
-
-    if (rotation_state == 3 || rotation_state == -1) {
-        new_grid.resize(grid_height, grid_width);
-
-        for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
-            if (x >= grid_width) {
-                x = 0;
-                y++;
-            }
+        else if (rotation_state == 3 || rotation_state == -1) {
             if (get(x, y) == Cell::ALIVE) {
                 new_grid(y, grid_width - x - 1) = Cell::ALIVE;
-            } else {
-                new_grid(y, grid_width - x - 1) = Cell::DEAD;
             }
-
         }
-        return new_grid;
     }
-    return *this;
+
+    return new_grid;
 }
 
 /**

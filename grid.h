@@ -77,7 +77,7 @@ public:
 
     void merge(Grid grid, int x0, int y0, bool alive_only = false);
 
-    Grid rotate(int rotation);
+    Grid rotate(int rotation) const;
 
     friend std::ostream &operator<<(std::ostream &stream, Grid grid);
 
