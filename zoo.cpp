@@ -204,7 +204,7 @@ Grid Zoo::load_ascii(std::string path) {
             x++;
         }
 
-        if (line[width + 1] != '\n' && line[width + 1] != '\r' && line[width + 1] != '\000') {
+        if (line[width] != '\n' && line[width] != '\r' && line[width] != '\000') {
             inFile.close();
             throw std::invalid_argument("Malformed newline.");
         }
