@@ -12,6 +12,7 @@
  * @date March, 2020
  */
 #include <iostream>
+#include <stdexcept>
 #include "grid.h"
 
 
@@ -367,11 +368,11 @@ int Grid::get_index(int x, int y) const {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 Cell Grid::get(int x, int y) const {
-    if (are_valid_other(x, y)) {
-        return Cell(operator()(x, y));
-    } else {
+
+    if (!are_valid_other(x, y)) {
         throw std::runtime_error("Coordinates not valid.");
     }
+    return Cell(operator()(x, y));
 }
 
 /**
@@ -404,11 +405,11 @@ Cell Grid::get(int x, int y) const {
 
 void Grid::set(int x, int y, int value) {
 
-    if (are_valid_other(x, y)) {
-        operator()(x, y) = static_cast<Cell>(value);
-    } else {
+    if (!are_valid_other(x, y)) {
         throw std::runtime_error("Coordinates not valid");
     }
+
+    operator()(x, y) = static_cast<Cell>(value);
 }
 
 /**
@@ -449,11 +450,11 @@ void Grid::set(int x, int y, int value) {
 
 Cell &Grid::operator()(int x, int y) {
 
-    if (are_valid_other(x, y)) {
-        return cells_arr[get_index(x, y)];
-    } else {
+    if (!are_valid_other(x, y)) {
+
         throw std::runtime_error("Coordinates not valid");
     }
+    return cells_arr[get_index(x, y)];
 }
 
 /**
@@ -488,11 +489,10 @@ Cell &Grid::operator()(int x, int y) {
  */
 const Cell &Grid::operator()(int x, int y) const {
 
-    if (are_valid_other(x, y)) {
-        return cells_arr[get_index(x, y)];
-    } else {
+    if (!are_valid_other(x, y)) {
         throw std::runtime_error("Coordinates are invalid.");
     }
+    return cells_arr[get_index(x, y)];
 }
 
 /**
@@ -535,27 +535,26 @@ Grid Grid::crop(int x0, int y0, int x1, int y1) const {
     // Checks if the new coordinates are within the bounds of the old grid.
     if (!are_valid_crop(x0, y0) || !are_valid_crop(x1, y1)) {
         throw std::range_error("Grid is not in the required ranges.");
-    } else {
-
-        // Sets the new grid height and weight.
-        int new_grid_width = x1 - x0;
-        int new_grid_height = y1 - y0;
-
-        Grid new_grid(new_grid_width, new_grid_height);
-
-        for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < new_grid.get_total_cells(); ++i, ++x, ++j) {
-
-            // Simulates 2D matrix from the 1D array used to store the data.
-            if (x >= x1) {
-                x = x0;
-                j = 0;
-                y++;
-                z++;
-            }
-            new_grid(j, z) = get(x, y);
-        }
-        return new_grid;
     }
+
+    // Sets the new grid height and weight.
+    int new_grid_width = x1 - x0;
+    int new_grid_height = y1 - y0;
+
+    Grid new_grid(new_grid_width, new_grid_height);
+
+    for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < new_grid.get_total_cells(); ++i, ++x, ++j) {
+
+        // Simulates 2D matrix from the 1D array used to store the data.
+        if (x >= x1) {
+            x = x0;
+            j = 0;
+            y++;
+            z++;
+        }
+        new_grid(j, z) = get(x, y);
+    }
+    return new_grid;
 }
 
 /**
@@ -600,25 +599,24 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
 
     if (!are_valid_crop(x0 + grid.get_width(), y0 + grid.get_height())) {
         throw std::range_error("Grid is not in the required ranges.");
-    } else {
+    }
 
-        for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < grid.get_total_cells(); ++i, ++x, ++j) {
+    for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < grid.get_total_cells(); ++i, ++x, ++j) {
 
-            // Simulates 2D matrix from the 1D array used to store the data.
-            if (j >= grid.get_width()) {
-                x = x0;
-                j = 0;
-                y++;
-                z++;
+        // Simulates 2D matrix from the 1D array used to store the data.
+        if (j >= grid.get_width()) {
+            x = x0;
+            j = 0;
+            y++;
+            z++;
+        }
+
+        if (alive_only) {
+            if (grid.get(j, z) == Cell::ALIVE) {
+                set(x, y, Cell::ALIVE);
             }
-
-            if (alive_only) {
-                if (grid.get(j, z) == Cell::ALIVE) {
-                    set(x, y, Cell::ALIVE);
-                }
-            } else {
-                set(x, y, grid.get(j, z));
-            }
+        } else {
+            set(x, y, grid.get(j, z));
         }
     }
 }
