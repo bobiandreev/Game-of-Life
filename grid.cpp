@@ -12,12 +12,8 @@
  * @date March, 2020
  */
 #include <iostream>
-#include <algorithm>
-#include <sstream>
 #include "grid.h"
 
-// Include the minimal number of headers needed to support your implementation.
-// #include ...
 
 /**
  * Grid::Grid()
@@ -84,6 +80,7 @@ Grid::Grid(int square_grid_size) : grid_width(square_grid_size), grid_height(squ
  */
 
 Grid::Grid(int width, int height) : grid_width(width), grid_height(height), cells_arr(get_total_cells()) {
+
     for (int i = 0; i < get_total_cells(); ++i) {
         cells_arr[i] = Cell::DEAD;
     }
@@ -199,6 +196,7 @@ int Grid::get_total_cells() const {
 
 int Grid::get_alive_cells() const {
     int count = 0;
+
     for (int i = 0; i < get_total_cells(); i++) {
         if (cells_arr[i] == Cell::ALIVE) {
             count++;
@@ -234,6 +232,7 @@ int Grid::get_alive_cells() const {
 
 int Grid::get_dead_cells() const {
     int count = 0;
+
     for (int i = 0; i < get_total_cells(); ++i) {
         if (cells_arr[i] == Cell::DEAD) {
             count++;
@@ -287,21 +286,20 @@ void Grid::resize(int square_size) {
  */
 
 void Grid::resize(int width, int height) {
-    int old_height = grid_height;
-    int old_width = grid_width;
-    int num_cells_new;
 
-    num_cells_new = width * height;
+    std::vector<Cell> new_grid(width * height);
 
-    std::vector<Cell> new_grid(num_cells_new);
-    for (int i = 0, x = 0, y = 0; i < num_cells_new; ++i, ++y) {
+    for (int i = 0, x = 0, y = 0; i < (width * height); ++i, ++y) {
 
+        // Simulates a 2D matrix from the 1D array used to store the data.
         if (y >= width) {
             y = 0;
             x++;
         }
 
-        if (y < old_width && x < old_height) {
+        // Checks if the index is within the bounds of the old grid and keeps the value if it is.
+        // If it is not it pads with DEAD cells.
+        if (y < grid_width && x < grid_height) {
             if (get(x, y) == Cell::ALIVE) {
                 new_grid[i] = Cell::ALIVE;
             } else {
@@ -311,6 +309,7 @@ void Grid::resize(int width, int height) {
             new_grid[i] = Cell::DEAD;
         }
     }
+
     std::swap(cells_arr, new_grid);
     grid_height = height;
     grid_width = width;
@@ -367,8 +366,12 @@ int Grid::get_index(int x, int y) const {
  * @throws
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
-int Grid::get(int x, int y) const {
-    return int(operator()(x, y));
+Cell Grid::get(int x, int y) const {
+    if (are_valid_other(x, y)) {
+        return Cell(operator()(x, y));
+    } else {
+        throw std::runtime_error("Coordinates not valid.");
+    }
 }
 
 /**
@@ -400,6 +403,7 @@ int Grid::get(int x, int y) const {
  */
 
 void Grid::set(int x, int y, int value) {
+
     if (are_valid_other(x, y)) {
         operator()(x, y) = static_cast<Cell>(value);
     } else {
@@ -444,6 +448,7 @@ void Grid::set(int x, int y, int value) {
  */
 
 Cell &Grid::operator()(int x, int y) {
+
     if (are_valid_other(x, y)) {
         return cells_arr[get_index(x, y)];
     } else {
@@ -482,6 +487,7 @@ Cell &Grid::operator()(int x, int y) {
  *      std::exception or sub-class if x,y is not a valid coordinate within the grid.
  */
 const Cell &Grid::operator()(int x, int y) const {
+
     if (are_valid_other(x, y)) {
         return cells_arr[get_index(x, y)];
     } else {
@@ -526,31 +532,27 @@ const Cell &Grid::operator()(int x, int y) const {
 
 Grid Grid::crop(int x0, int y0, int x1, int y1) const {
 
+    // Checks if the new coordinates are within the bounds of the old grid.
     if (!are_valid_crop(x0, y0) || !are_valid_crop(x1, y1)) {
         throw std::range_error("Grid is not in the required ranges.");
     } else {
 
-        int new_grid_height = x1 - x0;
-        int new_grid_width = y1 - y0;
+        // Sets the new grid height and weight.
+        int new_grid_width = x1 - x0;
+        int new_grid_height = y1 - y0;
 
         Grid new_grid(new_grid_width, new_grid_height);
 
         for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < new_grid.get_total_cells(); ++i, ++x, ++j) {
+
+            // Simulates 2D matrix from the 1D array used to store the data.
             if (x >= x1) {
                 x = x0;
-                y++;
-            }
-
-            if (j >= new_grid.get_width()) {
                 j = 0;
+                y++;
                 z++;
             }
-
-            if (get(x, y) == Cell::ALIVE) {
-                new_grid(j, z) = Cell::ALIVE;
-            } else {
-                new_grid(j, z) = Cell::DEAD;
-            }
+            new_grid(j, z) = get(x, y);
         }
         return new_grid;
     }
@@ -595,12 +597,14 @@ Grid Grid::crop(int x0, int y0, int x1, int y1) const {
  */
 
 void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
+
     if (!are_valid_crop(x0 + grid.get_width(), y0 + grid.get_height())) {
         throw std::range_error("Grid is not in the required ranges.");
     } else {
 
         for (int i = 0, x = x0, y = y0, j = 0, z = 0; i < grid.get_total_cells(); ++i, ++x, ++j) {
 
+            // Simulates 2D matrix from the 1D array used to store the data.
             if (j >= grid.get_width()) {
                 x = x0;
                 j = 0;
@@ -608,7 +612,7 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
                 z++;
             }
 
-            if (alive_only != false) {
+            if (alive_only) {
                 if (grid.get(j, z) == Cell::ALIVE) {
                     set(x, y, Cell::ALIVE);
                 }
@@ -644,10 +648,13 @@ void Grid::merge(Grid grid, int x0, int y0, bool alive_only) {
  */
 
 Grid Grid::rotate(int rotation) const {
+
+    // The grid can only be in one of 4 states no matter the input. Transforms input into the correct state.
     int rotation_state = rotation % 4;
 
     Grid new_grid(grid_height, grid_width);
 
+    // Changes grid dimensions based on the input.
     if (rotation_state == 2 || rotation_state == -2) {
         new_grid.resize(grid_width, grid_height);
     }
@@ -658,26 +665,25 @@ Grid Grid::rotate(int rotation) const {
 
     for (int i = 0, x = 0, y = 0; i < get_total_cells(); ++i, ++x) {
 
+        // Simulates 2D matrix from the 1D array used to store the data.
         if (x >= grid_width) {
             x = 0;
             y++;
         }
 
+        // Rearranges the grid based on the state.
         if (rotation_state == 1 || rotation_state == -3) {
             if (get(x, y) == Cell::ALIVE) {
                 new_grid(grid_height - y - 1, x) = Cell::ALIVE;
             }
-        }
-        else if (rotation_state == 2 || rotation_state == -2) {
+        } else if (rotation_state == 2 || rotation_state == -2) {
             new_grid(x, y) = cells_arr[(get_total_cells() - i) - 1];
-        }
-        else if (rotation_state == 3 || rotation_state == -1) {
+        } else if (rotation_state == 3 || rotation_state == -1) {
             if (get(x, y) == Cell::ALIVE) {
                 new_grid(y, grid_width - x - 1) = Cell::ALIVE;
             }
         }
     }
-
     return new_grid;
 }
 
@@ -718,16 +724,18 @@ Grid Grid::rotate(int rotation) const {
  *      Returns a reference to the output stream to enable operator chaining.
  */
 
-std::ostream &operator<<(std::ostream &stream, Grid grid) {
+std::ostream &operator<<(std::ostream &stream, const Grid &grid) {
+
     stream << '+';
     for (int i = 0; i < grid.get_width(); ++i) {
         stream << '-';
     }
     stream << '+' << std::endl;
+
     for (int y = 0; y < grid.get_height(); ++y) {
         stream << '|';
         for (int x = 0; x < grid.get_width(); ++x) {
-            if (grid.get(x, y) == '#') {
+            if (grid.get(x, y) == Cell::ALIVE) {
                 stream << '#';
             } else {
                 stream << ' ';
@@ -735,23 +743,25 @@ std::ostream &operator<<(std::ostream &stream, Grid grid) {
         }
         stream << '|' << std::endl;
     }
+
     stream << '+';
     for (int i = 0; i < grid.get_width(); ++i) {
         stream << '-';
     }
     stream << '+' << std::endl;
+
     return stream;
 }
 
 /**
- * bool::areValid(int x, int y)
+ * bool::are_valid(int x, int y)
  *
  * Public helper method which is used to check if the provided coordinates x (width)
  * and y (height) are valid coordinates in the given grid.
  *
  * @example
  *
- * if(areValid(x,y)){
+ * if(are_valid(x,y)){
  *      then ....
  *   }
  *
@@ -775,6 +785,30 @@ bool Grid::are_valid(int x, int y) const {
     }
 }
 
+/**
+ * bool::are_valid_crop(int x, int y)
+ *
+ * Public helper method which is used to check if the provided coordinates x (width)
+ * and y (height) are valid coordinates in the given grid for the crop method.
+ *
+ * @example
+ *
+ * if(are_valid_crop(x,y)){
+ *      then ....
+ *   }
+ *
+ *   A boolean indicating if both coordinates are valid for the crop method is returned.
+ *
+ *   @param x
+ *          The width coordinate.
+ *
+ *   @param y
+ *          The height coordinate.
+ *
+ *   @return
+ *         True if both coordinates are in the current grid, false otherwise.
+ */
+
 bool Grid::are_valid_crop(int x, int y) const {
     if (x > grid_width || y > grid_height) {
         return false;
@@ -782,6 +816,30 @@ bool Grid::are_valid_crop(int x, int y) const {
         return are_valid(x, y);
     }
 }
+
+/**
+ * bool::are_valid_other(int x, int y)
+ *
+ * Public helper method which is used to check if the provided coordinates x (width)
+ * and y (height) are valid coordinates in the given grid for all methods except crop.
+ *
+ * @example
+ *
+ * if(are_valid_other(x,y)){
+ *      then ....
+ *   }
+ *
+ *   A boolean indicating if both coordinates are valid for all methods except crop is returned.
+ *
+ *   @param x
+ *          The width coordinate.
+ *
+ *   @param y
+ *          The height coordinate.
+ *
+ *   @return
+ *         True if both coordinates are in the current grid, false otherwise.
+ */
 
 bool Grid::are_valid_other(int x, int y) const {
     if (x >= grid_width || y >= grid_height) {

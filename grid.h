@@ -13,8 +13,6 @@
 // Add the minimal number of includes you need in order to declare the class.
 // #include ...
 #include <iostream>
-#include <algorithm>
-#include <sstream>
 #include <vector>
 
 /**
@@ -29,14 +27,11 @@ enum Cell : char {
  * Declare the structure of the Grid class for representing a 2d grid of cells.
  */
 class Grid {
-    // How to draw an owl:
-    //      Step 1. Draw a circle.
-    //      Step 2. Draw the rest of the owl.
+
 private:
 
     int grid_width;
     int grid_height;
-
 
     std::vector<Cell> cells_arr;
 
@@ -65,7 +60,7 @@ public:
 
     void resize(int width, int height);
 
-    int get(int x, int y) const;
+    Cell get(int x, int y) const;
 
     Cell &operator()(int x, int y);
 
@@ -79,7 +74,7 @@ public:
 
     Grid rotate(int rotation) const;
 
-    friend std::ostream &operator<<(std::ostream &stream, Grid grid);
+    friend std::ostream &operator<<(std::ostream &stream, const Grid &grid);
 
     bool are_valid(int x, int y) const;
 

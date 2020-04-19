@@ -22,14 +22,11 @@
  * @date March, 2020
  */
 #include <fstream>
-#include <sys/stat.h>
 #include <bitset>
-#include "zoo.h"
+#include <algorithm>
 #include "grid.h"
+#include "zoo.h"
 
-
-// Include the minimal number of headers needed to support your implementation.
-// #include ...
 
 /**
  * Zoo::glider()
@@ -179,11 +176,6 @@ Grid Zoo::load_ascii(std::string path) {
 
     inFile.get(character);
 
-    if (character != '\n' && character != '\r' && character != '\000') {
-        inFile.close();
-        throw std::invalid_argument("Malformed newline.");
-    }
-
     Grid grid(width, height);
     char line[width + 1];
 
@@ -208,10 +200,12 @@ Grid Zoo::load_ascii(std::string path) {
             inFile.close();
             throw std::invalid_argument("Malformed newline.");
         }
+
         x = 0;
         y++;
     }
     inFile.close();
+
     return grid;
 }
 
@@ -249,8 +243,7 @@ void Zoo::save_ascii(std::string path, Grid grid) {
     if (!outFile.is_open()) {
         throw std::invalid_argument("No such path");
     }
-    outFile << grid.get_width() << " ";
-    outFile << grid.get_height() << std::endl;
+    outFile << grid.get_width() << " " << grid.get_height() << std::endl;
 
     for (int y = 0; y < grid.get_height(); ++y) {
         for (int x = 0; x < grid.get_width(); ++x) {

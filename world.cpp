@@ -153,6 +153,7 @@ const int &World::get_width() const {
  * @return
  *      The height of the world.
  */
+
 const int &World::get_height() const {
     return current_state.get_height();
 }
@@ -357,10 +358,10 @@ void World::resize(int width, int height) {
 
 int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
     int counter = 0;    // initializing counter
-    int neighbours_size = 3 * 3;    // storing the calculated neighbour size
+    int neighbours_size = 9;    // storing the neighbour area
 
     for (int i = 0, x = x_cent - 1, y = y_cent - 1; i < neighbours_size; ++i, ++x) {
-        if (!toroidal) {// if toroidal is false
+        if (!toroidal) {    // if toroidal is false
 
             if (current_state.are_valid_other(x, y)) {
                 if (x != x_cent || y != y_cent) {
@@ -370,7 +371,7 @@ int World::count_neighbours(int x_cent, int y_cent, bool toroidal) {
                 }
             }
 
-        } else { // if toroidal is true
+        } else {    // if toroidal is true
 
             if (current_state.are_valid_other(x, y)) {     // if there is no wrapping around edges
                 if (x != x_cent || y != y_cent) {
@@ -444,21 +445,13 @@ void World::step(bool toroidal) {
 
         if (num_neighbours < 2) {
             next_state.set(x, y, Cell::DEAD);
-        }
-
-        else if (num_neighbours > 3) {
+        } else if (num_neighbours > 3) {
             next_state.set(x, y, Cell::DEAD);
-        }
-
-        else if (num_neighbours == 2) {
+        } else if (num_neighbours == 2) {
             if (current_state.get(x, y) == Cell::ALIVE) {
                 next_state.set(x, y, Cell::ALIVE);
-            } else {
-                next_state.set(x, y, Cell::DEAD);
             }
-        }
-
-        else if (num_neighbours == 3) {
+        } else if (num_neighbours == 3) {
             next_state.set(x, y, Cell::ALIVE);
         }
     }
